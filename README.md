@@ -1,10 +1,10 @@
 Käytetyt teknologiat:
 
-Expo
+Expo:
 Sovellusrajapinta jonka avulla voi helposti testata ja julkaista projekteja.
 
-React-native
+React-native:
 Javascriptin avoimen lähdekoodin käyttöliittymäohjelmistokehys.
 
-Firebase
+Firebase:
 Googlen no-sql tietokantapalvelu.
