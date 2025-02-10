@@ -1,8 +1,7 @@
 import { useNavigation } from '@react-navigation/core'
 import React from 'react'
-import { StyleSheet, TextInput, View, Text } from 'react-native'
-import { KeyboardAvoidingView, TouchableOpacity } from 'react-native-web'
-import { auth } from './firebase'
+import { StyleSheet, TextInput, View, Text, Pressable } from 'react-native'
+import { auth } from '../firebase'
 import { useEffect } from 'react'
 
 const Loginscreen = () => {
@@ -42,11 +41,8 @@ const Loginscreen = () => {
     }
 
     return (
-        <KeyboardAvoidingView
-        style={styles.container}
-        behavior="padding"
-        >    
-        <Text style={{fontSize: 26, fontWeight: '500', marginBottom: '30px', color:'#363636'}}>Houseplant tracker</Text>
+        <View style={styles.container}>
+            <Text style={styles.header}>Houseplant tracker</Text>
             <View style={styles.inputContainer}>
                 <TextInput 
                     placeholder="Email"
@@ -61,21 +57,20 @@ const Loginscreen = () => {
                     style={styles.input}
                     secureTextEntry
                 />
-                <View style={styles.buttonContainer}/>
-                <TouchableOpacity
+            </View>
+            <View style={styles.buttonContainer}>
+                <Pressable
                     onPress={handleLogin}
-                    style={styles.button}
-                >
+                    style={styles.button}>
                     <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </Pressable>
+                <Pressable
                     onPress={handleSignUp}
-                    style={[styles.button, styles.buttonOutline]}
-                >
+                    style={[styles.button, styles.buttonOutline]}>
                     <Text style={styles.buttonOutlineText}>Register</Text>
-                </TouchableOpacity>
-                </View>
-        </KeyboardAvoidingView>
+                </Pressable>
+            </View>
+        </View>
     )
 }
 
@@ -83,10 +78,10 @@ export default Loginscreen
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#fff',
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#fff',
     },
     input: {
         backgroundColor: '#F5F5F5',
@@ -94,6 +89,12 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 5,
+    },
+    header: {
+        fontSize: 26, 
+        fontWeight: '500',
+        margin: 50, 
+        color:'#363636'
     },
     buttonContainer: {
         width: '60%',
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#0782F9',
-        width: '100%',
+        width: 100,
         padding: 10,
         borderRadius: 10,
         alignItems: 'center',

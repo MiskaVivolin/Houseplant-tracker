@@ -1,11 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import HomeScreen from './HomeScreen';
-import SettingScreen from './SettingScreen';
-import { Ionicons } from '@expo/vector-icons'
+import Homescreen from './src/screens/Homescreen';
+import Settingscreen from './src/screens/Settingscreen';
 import { createStackNavigator } from '@react-navigation/stack';
-import Loginscreen from './Loginscreen';
+import Loginscreen from './src/screens/Loginscreen';
+import Viewplantscreen from './src/screens/Viewplantscreen';
 
 
 export default function App() {
@@ -16,8 +15,9 @@ const Stack = createStackNavigator();
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen options={{ headerShown: false}} name="Login" component={Loginscreen} />
-        <Stack.Screen options={{ headerShown: false}} name="Home" component={HomeScreen} />
-        <Stack.Screen name="Plant info" component={SettingScreen} />
+        <Stack.Screen options={{ headerShown: false}} name="Home" component={Homescreen} />
+        <Stack.Screen options={{ headerShown: false}} name="Viewlist" component={Viewplantscreen} />
+        <Stack.Screen name="Plant info" component={Settingscreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

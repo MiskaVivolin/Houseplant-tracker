@@ -1,45 +1,67 @@
-import React, { useEffect } from 'react';
-import { FlatList, StyleSheet, Text, View, TextInput } from 'react-native';
-import { getDatabase, push, ref, onValue, remove } from "firebase/database";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TextInput, Image, Pressable } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { getDatabase, push, ref } from "firebase/database";
 import { initializeApp } from "firebase/app";
-import { auth, firebaseConfig } from './firebase';
-import { TouchableOpacity } from 'react-native-web';
+import { auth, firebaseConfig } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
-import firebase from "firebase/compat/app";
 
 
-export default function Homescreen(props) {
+export default function Homescreen() {
 
-  const [plantlist, setPlantlist] = React.useState([])
-  const [idlist, setIdlist] = React.useState([])
   const [name, setName] = React.useState('')
   const [watering, setWatering] = React.useState('')
   const [lightning, setLightning] = React.useState('')
   const [nutrient, setNutrient] = React.useState('')
   const [facts, setFacts] = React.useState('')
   const [picture, setPicture] = React.useState('')
-  const [number, setNumber] = React.useState('')
+  const [image, setImage] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null);
 
-  let list = []
-
+  
   const app = initializeApp(firebaseConfig);
   const database = getDatabase(app);
-
+  
   const navigation = useNavigation()
-
-   useEffect(() => {
-    const plantsRef = ref(database, 'plants/')
-      onValue(plantsRef, (snapshot) => {
-        const data = snapshot.val()
-        setPlantlist(Object.values(data))
-      })
-      onValue(plantsRef, (snapshot) => {
-        const data = snapshot.val()
-        const datatostring = Object.keys(data) + ''
-        list = datatostring.split(',')
-        setIdlist(list)
-      })
-   }, [])
+  
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+    }, [])
+    
+    const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    };
+  
+    const takePhoto = async () => {
+      let result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    };
+  
+    if (hasPermission === null) {
+      return <Text>Requesting permissions...</Text>;
+    }
+    if (hasPermission === false) {
+      return <Text>No access to camera or media library</Text>;
+    }
 
   const handleSignOut = () => {
     auth
@@ -59,28 +81,8 @@ export default function Homescreen(props) {
     })
   }
 
-  const listSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: "100%",
-          backgroundColor: "#CED0CE",
-          
-        }}
-      />
-    )
-  }
 
-  const deletePlant = () => {
-    remove(ref(database, 'plants/' + idlist[number - 1]), {
-    })
-    .catch(() => {
-      alert("error deleting data")
-    })
-}
 
-  const { navigate } = props.navigation
 
   return (
     <View style={styles.container}>
@@ -124,37 +126,22 @@ export default function Homescreen(props) {
         value={picture}
         />
         <View style={{marginTop: '10px'}}/>
-    <TouchableOpacity style={styles.button} onPress={saveplant}><Text style={styles.buttonText}>Add</Text></TouchableOpacity>
-    <Text style={{fontSize: 22, marginTop: 40, marginBottom: 20, fontWeight: '500', color:'#363636' }}>Your houseplants</Text>
-    <FlatList
-    data={plantlist}
-    keyExtractor={idlist => idlist.toString()}
-    renderItem={({item}) =>
-    <View style={{flexDirection: 'row', marginTop: 3, marginBottom: 3}}>
-      <Text style={{fontSize:20}}>{item.name}  </Text>
-      <TouchableOpacity style={styles.button}
-      title='Details'
-      onPress={() => navigate('Plant info', {item: JSON.stringify(item)})}
-      ><Text style={styles.buttonText}>Details</Text></TouchableOpacity>
-      
-    </View>}
-    ItemSeparatorComponent={listSeparator}
-    />
+                    <Pressable style={styles.button}
+                    title='Details'
+                    onPress={() => navigation.replace('Viewlist')}
+                    ><Text style={styles.buttonText}>Plant list</Text></Pressable>
+    <Pressable style={styles.button} onPress={saveplant}><Text style={styles.buttonText}>Add</Text></Pressable>
+    <Pressable style={styles.button} title="Pick an image from gallery" onPress={pickImage}><Text style={styles.buttonText}>Pick</Text></Pressable>
+    <Pressable style={styles.button} title="Take a photo" onPress={takePhoto}><Text style={styles.buttonText}>Take</Text></Pressable>
+    {image && <Image source={{ uri: image }} style={{ width: 200, height: 200, marginTop: 20 }} />}
 
-    <Text style={{fontSize: 16, marginTop: 50, marginBottom: 10, fontWeight: '500', color:'#363636'}}>Delete by order</Text>
-        <TextInput placeholder={"number"} 
-        style={styles.input}
-        onChangeText={number => setNumber(number)}
-        value={number}
-        />
-        <TouchableOpacity style={styles.removebutton} onPress={deletePlant}><Text style={styles.buttonText}>Delete</Text></TouchableOpacity>
-    <TouchableOpacity
+    <Pressable
       onPress={handleSignOut}
       style={styles.signoutbutton}
       >
     
       <Text style={styles.buttonText}>Sign out</Text>
-    </TouchableOpacity>
+    </Pressable>
     <Text>Signed in as: {auth.currentUser?.email}</Text>
     </View>
   );
